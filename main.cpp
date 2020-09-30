@@ -97,7 +97,7 @@ class Student{
             cout<<"\n What is the name of the student?";
             fflush(stdin);
             gets(studentName);
-            
+            borrowedbook[0] = '\0';
             cout<<"\n Do you want to confirm the student's name? (y/n)";
             cin>>q;
             
@@ -117,6 +117,7 @@ class Student{
             puts(studentName);
             cout<<"\n The student's id is:"<<studentId;
             cout<<"\n"<<borrowed;
+            cout<<"\n"<<borrowedbook;
         }
 
         void resetBorrowed(){
@@ -128,8 +129,8 @@ class Student{
         char* show_bookName(){
             return borrowedbook;
         }
-        void add_book(){
-            cin>>borrowedbook;
+        void add_book(char bn[]){
+            strcpy(borrowedbook, bn);
 
 
         }
@@ -310,6 +311,8 @@ void borrow(){
                                 flag=1;
                                 bool now = student.addBorrowed();
                                 book.addBorrowed();
+                                
+                                student.add_book(bn);
                                 int pos = -1* sizeof(student);
                                 int pos1 = -1* sizeof(book);
                                 fw.seekp(pos1, ios::cur);
@@ -362,30 +365,30 @@ void return_book(){
     fp.open("student.dat", ios::out|ios::in);
         fw.open("book.dat", ios::out|ios::in);
         while(fp.read((char*)&student, sizeof(Student)) && found==0){
-
+                
 
                 if(strcmp(student.return_stno(),id)==0){
                     found=1;
-                        student.resetBorrowed();
-                        int pos = -1*sizeof(Student);
-                        fp.seekp(pos, ios::cur);
-                        fp.write((char*)&student, sizeof(Student));
                         
                         
                         
-                        cout<<"\nEnter the book name";
-                        cin>>bn;
-                        while(fp.read((char*)&book, sizeof(Book)) && flag==0){
+                       
+                        while(fw.read((char*)&book, sizeof(Book)) && flag==0){
                             
+                            cout<<student.show_bookName()<<"\n"<<"he"<<book.return_bname()<<"he"<<"\n";
                             
-                            
-                            if(strcmp(book.return_bname(), bn)==0){
+                            if(strcmp(book.return_bname(), student.show_bookName())==0){
                                 flag=1;
-                                book.resetBorrowed();
-                                int pos = -1 * sizeof(Book);
+                                student.resetBorrowed();
+                                int pos = -1*sizeof(Student);
                                 fp.seekp(pos, ios::cur);
-                                fp.write((char*)&book, sizeof(Book));
-
+                                fp.write((char*)&student, sizeof(Student));
+                        
+                                book.resetBorrowed();
+                                int pos1 = -1 * sizeof(Book);
+                                fw.seekp(pos1, ios::cur);
+                                fw.write((char*)&book, sizeof(Book));
+                                cout<<"Returned book successfully";
                             }
                         
                         
@@ -410,6 +413,8 @@ void return_book(){
 
 
 int main(){
+    char bor[10]={'a','b','c','d','e','f','g','h','i','j'};
+    cout<<bor;
     cout<<"What do you want to do??";
     cout<<"\n1. Create Book";
     cout<<"\n2. create Student record";
@@ -418,6 +423,7 @@ int main(){
     cout<<"\n5.Look at book record";
     cout<<"\n6. List all books";
     cout<<"\n7. Borrow a book ";
+    cout<<"\n8. Return a book";
     int q;
     char bname[100];
     char st[6];
@@ -447,6 +453,9 @@ int main(){
     }
     else if(q==7){
         borrow();
+    }
+    else if(q=8){
+        return_book();
     }
 
     return 0;
